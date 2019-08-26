@@ -1,0 +1,6 @@
+Possible libraries to replace matlab
+
+numpy - for OpenCV
+Scipy
+Pillow?
+OpenCV
