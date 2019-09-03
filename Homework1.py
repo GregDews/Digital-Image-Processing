@@ -21,4 +21,5 @@ for i in range(width):    # for every col:
         else:
             imgpixels[i,j] = (0)
 
+img.save("NyanInFrame.BMP")
 img.show()
