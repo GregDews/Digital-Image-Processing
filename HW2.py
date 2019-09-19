@@ -11,44 +11,37 @@ Homework 1
     pupil should be ~35-45 pixels
     use thresholding and mask out noise in background
 """
-import PIL
-from PIL import Image
+from PIL import Image, ImageFilter
 
 # Load images, Create the pixel map
-iris = Image.open("iris.bmp").convert('LA')
+iris = Image.open("iris.bmp").convert('L')
 #iris_pixels = im.load()
-autumn = Image.open("PrincessAutumn.jpg").convert('LA')
-sobel_autumn = Image.new('L', autumn.size)
-laplacian_autumn = Image.new('L', autumn.size)
-median_autumn = Image.new('L', autumn.size)
+autumn = Image.open("PrincessAutumn.jpg").convert('L')
+autumn.save("GreyAutumn.jpg")
+sobel_autumn = Image.new("L", autumn.size)
+laplacian_autumn = Image.new("L", autumn.size)
+median_autumn = Image.new("L", autumn.size)
 
 # Create kernels
-sobelx = PIL.ImageFilter.Kernel((3,3),
-(-1,0,1,-2,0,2,-1,0,1)
-,1,0)
-sobely = PIL.ImageFilter.Kernel((3,3),
-(1,0,-1,2,0,-2,1,0,-1)
-,1,0)
-laplacian = PIL.ImageFilter.Kernel((3,3),
-(0,-1,0,-1,4,-1,0,-1,0)
-,1,0)
-median = PIL.ImageFilter.Kernel((3,3),
-(1,1,1,1,1,1,1,1,1)
-,1,0)
+sobelx = ImageFilter.Kernel((3,3),
+(-1, 0, 1,
+ -2, 0, 2,
+ -1, 0, 1))
+laplacian = ImageFilter.Kernel((3,3),
+(-1,-1, -1,
+ -1, 8, -1,
+ -1,-1, -1))
+median = ImageFilter.Kernel((3,3),
+( 1, 1, 1,
+  1, 1, 1,
+  1, 1, 1))
 
 # Apply filters
-horizontal = autumn.filter(sobelx)
-#vertical = autumn.filter(sobely)
-#sobel_autumn = horizontal + vertical
-laplacian_autumn = autumn.filter(laplacian)
-median_autumn = autumn.filter(median)
+sobel_autumn = autumn.filter(filter= sobelx)
+laplacian_autumn = autumn.filter(filter= laplacian)
+median_autumn = autumn.filter(filter= median)
 
 # Save Pictures
-sobel_autumn.save("SobelAutumn.png")
-laplacian_autumn.save("LaplacianAutumn.png")
-median_autumn.save("MedianAutumn.png")
-
-# Show pictures
-sobel_autumn.show
-laplacian_autumn.show
-median_autumn.show
+sobel_autumn.save("SobelAutumn.jpg")
+laplacian_autumn.save("LaplacianAutumn.jpg")
+median_autumn.save("MedianAutumn.jpg")
