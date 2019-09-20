@@ -26,7 +26,7 @@ median_autumn = Image.new("L", autumn.size)
 sobelx = ImageFilter.Kernel((3,3),
 (-1, 0, 1,
  -2, 0, 2,
- -1, 0, 1))
+ -1, 0, 1),0,0)
 laplacian = ImageFilter.Kernel((3,3),
 (-1,-1, -1,
  -1, 8, -1,
