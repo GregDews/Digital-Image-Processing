@@ -15,42 +15,48 @@ from PIL import Image, ImageFilter
 from scipy import ndimage
 import numpy as np
 
-# Load images, Create the pixel map
+# Load images, Create the nparray of greyscale
 iris = Image.open("iris.bmp").convert('L')
-#iris_pixels = im.load()
+
 autumn = Image.open("PrincessAutumn.jpg").convert('L')
 autumn.save("GreyAutumn.jpg")
-
-img = ndimage.imread("GreyAutumn.jpg")
+autumn = autumn.filter(ImageFilter.GaussianBlur)
+autumn.save("GaussianAutumn.jpg")
+img = np.asarray(autumn, dtype='uint8')
 
 # sobel
-sobel_weights = np.array([
+sobelx_weights = np.array([
         [-1, 0, 1],
-        [-2, 0, 2],
+        [-1, 0, 1],
         [-1, 0, 1]])
 
-out = ndimage.convolve(img, sobel_weights)
-sobel_autumn = Image.fromarray(out, "L")
+sobely_weights = np.array([
+        [-1,-1,-1],
+        [ 0, 0, 0],
+        [ 1, 1, 1]])
+
+x_out = ndimage.convolve(img, sobelx_weights)
+y_out = ndimage.convolve(img, sobely_weights)
+out = (x_out + y_out)
+sobel_autumn = Image.fromarray(out, 'L')
 sobel_autumn.save("SobelAutumn.jpg")
-"""
+
 # laplacian
 #laplacian_autumn = Image.new("L", autumn.size)
-laplacian = ImageFilter.Kernel((3,3),
-(-1,-1, -1,
- -1, 8, -1,
- -1,-1, -1),0,0)
-laplacian_autumn = autumn.filter(filter= laplacian)
-laplacian_autumn = ImageOps.equalize(laplacian_autumn)
+laplacian_weights = np.array([
+        [-1,-1, -1],
+        [-1, 8, -1],
+        [-1,-1, -1]])
+out = ndimage.convolve(img, laplacian_weights)
+laplacian_autumn = Image.fromarray(out, 'L')
 laplacian_autumn.save("LaplacianAutumn.jpg")
-tester = laplacian_autumn.filter(ImageFilter.MedianFilter)
-tester.save("laplacian_test.jpg")
 
 # median
 #median_autumn = Image.new("L", autumn.size)
-median = ImageFilter.Kernel((3,3),
-( 1, 1, 1,
-  1, 1, 1,
-  1, 1, 1),9,0)
-median_autumn = autumn.filter(filter= median)
+median_weights = np.array([
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1]])/9
+out = ndimage.convolve(img, median_weights)
+median_autumn = Image.fromarray(out, "L")
 median_autumn.save("MedianAutumn.jpg")
-"""
