@@ -13,50 +13,62 @@ Homework 1
 """
 from PIL import Image, ImageFilter
 from scipy import ndimage
+from math import sqrt
 import numpy as np
+import cv2
 
-# Load images, Create the nparray of greyscale
-iris = Image.open("iris.bmp").convert('L')
-
+# Load autumn, Create the nparray of greyscale
 autumn = Image.open("PrincessAutumn.jpg").convert('L')
 autumn.save("GreyAutumn.jpg")
-autumn = autumn.filter(ImageFilter.GaussianBlur)
-autumn.save("GaussianAutumn.jpg")
 img = np.asarray(autumn, dtype='uint8')
 
-# sobel
+# average
+average_weights = np.array([
+    [ 1, 1, 1, 1, 1],
+    [ 1, 1, 1, 1, 1],
+    [ 1, 1, 1, 1, 1],
+    [ 1, 1, 1, 1, 1],
+    [ 1, 1, 1, 1, 1]])/25
+out = ndimage.convolve(img, average_weights)
+average_autumn = Image.fromarray(out, "L")
+average_autumn.save("averageAutumn.jpg")
+
+# sobel 
 sobelx_weights = np.array([
-        [-1, 0, 1],
-        [-1, 0, 1],
-        [-1, 0, 1]])
+    [ 2, 2, 2, 2, 2],
+    [ 1, 1, 1, 1, 1],
+    [ 0, 0, 0, 0, 0],
+    [-1,-1,-1,-1,-1],
+    [-2,-2,-2,-2,-2]])
 
 sobely_weights = np.array([
-        [-1,-1,-1],
-        [ 0, 0, 0],
-        [ 1, 1, 1]])
+    [ 2, 1, 0,-1,-2],
+    [ 2, 1, 0,-1,-2],
+    [ 2, 1, 0,-1,-2],
+    [ 2, 1, 0,-1,-2],
+    [ 2, 1, 0,-1,-2]])
 
-x_out = ndimage.convolve(img, sobelx_weights)
-y_out = ndimage.convolve(img, sobely_weights)
-out = (x_out + y_out)
+out = ndimage.convolve(img, sobelx_weights)
 sobel_autumn = Image.fromarray(out, 'L')
 sobel_autumn.save("SobelAutumn.jpg")
 
 # laplacian
-#laplacian_autumn = Image.new("L", autumn.size)
 laplacian_weights = np.array([
-        [-1,-1, -1],
-        [-1, 8, -1],
-        [-1,-1, -1]])
-out = ndimage.convolve(img, laplacian_weights)
+    [ 0, 0,-1, 0, 0],
+    [ 0,-1,-2,-1, 0],
+    [-1,-2,16,-2,-1],
+    [ 0,-1,-2,-1, 0],
+    [ 0, 0,-1, 0, 0]])
+out = ndimage.convolve(img, average_weights)
+out = ndimage.convolve(out, laplacian_weights)
 laplacian_autumn = Image.fromarray(out, 'L')
 laplacian_autumn.save("LaplacianAutumn.jpg")
 
-# median
-#median_autumn = Image.new("L", autumn.size)
-median_weights = np.array([
-        [1, 1, 1],
-        [1, 1, 1],
-        [1, 1, 1]])/9
-out = ndimage.convolve(img, median_weights)
-median_autumn = Image.fromarray(out, "L")
-median_autumn.save("MedianAutumn.jpg")
+# iris processing
+iris = Image.open("iris.bmp").convert('L')
+img = np.asarray(iris, dtype='uint8')
+out_x = ndimage.convolve(img, sobelx_weights)
+out_y = ndimage.convolve(img, sobely_weights)
+out = out_x + out_y
+sobel_iris = Image.fromarray(out, 'L')
+sobel_iris.save("SobelIris.jpg")
