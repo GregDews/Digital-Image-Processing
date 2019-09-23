@@ -11,16 +11,14 @@ Homework 1
     pupil should be ~35-45 pixels
     use thresholding and mask out noise in background
 """
-from PIL import Image, ImageFilter
-from scipy import ndimage
-from math import sqrt
+from PIL import Image
 import numpy as np
 import cv2
 
 # Load autumn, Create the nparray of greyscale
 autumn = Image.open("PrincessAutumn.jpg").convert('L')
 autumn.save("GreyAutumn.jpg")
-img = np.asarray(autumn, dtype='uint8')
+img = cv2.imread("GreyAutumn.jpg",0)
 
 # average
 average_weights = np.array([
@@ -29,46 +27,44 @@ average_weights = np.array([
     [ 1, 1, 1, 1, 1],
     [ 1, 1, 1, 1, 1],
     [ 1, 1, 1, 1, 1]])/25
-out = ndimage.convolve(img, average_weights)
-average_autumn = Image.fromarray(out, "L")
+out = cv2.filter2D(img, -1, average_weights)
+average_autumn = Image.fromarray(out)
 average_autumn.save("averageAutumn.jpg")
 
 # sobel 
 sobelx_weights = np.array([
-    [ 2, 2, 2, 2, 2],
-    [ 1, 1, 1, 1, 1],
-    [ 0, 0, 0, 0, 0],
-    [-1,-1,-1,-1,-1],
-    [-2,-2,-2,-2,-2]])
+    [ 1, 1, 1],
+    [ 0, 0, 0],
+    [-1,-1,-1]])
 
 sobely_weights = np.array([
-    [ 2, 1, 0,-1,-2],
-    [ 2, 1, 0,-1,-2],
-    [ 2, 1, 0,-1,-2],
-    [ 2, 1, 0,-1,-2],
-    [ 2, 1, 0,-1,-2]])
+    [-1, 0, 1],
+    [-1, 0, 1],
+    [-1, 0, 1]])
 
-out = ndimage.convolve(img, sobelx_weights)
-sobel_autumn = Image.fromarray(out, 'L')
+out_x = cv2.filter2D(img,-1, sobelx_weights)
+out_y = cv2.filter2D(img,-1, sobely_weights)
+out = out_x + out_y
+sobel_autumn = Image.fromarray(out)
 sobel_autumn.save("SobelAutumn.jpg")
 
 # laplacian
 laplacian_weights = np.array([
-    [ 0, 0,-1, 0, 0],
-    [ 0,-1,-2,-1, 0],
-    [-1,-2,16,-2,-1],
-    [ 0,-1,-2,-1, 0],
-    [ 0, 0,-1, 0, 0]])
-out = ndimage.convolve(img, average_weights)
-out = ndimage.convolve(out, laplacian_weights)
-laplacian_autumn = Image.fromarray(out, 'L')
+    [-1,-1,-1,],
+    [-1, 8,-1,],
+    [-1,-1,-1,]])
+
+out = cv2.filter2D(img, -1, laplacian_weights)
+laplacian_autumn = Image.fromarray(out)
 laplacian_autumn.save("LaplacianAutumn.jpg")
 
 # iris processing
-iris = Image.open("iris.bmp").convert('L')
-img = np.asarray(iris, dtype='uint8')
-out_x = ndimage.convolve(img, sobelx_weights)
-out_y = ndimage.convolve(img, sobely_weights)
-out = out_x + out_y
-sobel_iris = Image.fromarray(out, 'L')
-sobel_iris.save("SobelIris.jpg")
+iris = cv2.imread( "iris.bmp", 0)
+out_not_x = cv2.filter2D(iris,-1, sobelx_weights * (-1))
+out_x = cv2.filter2D(iris,-1, sobelx_weights)
+out_not_y = cv2.filter2D(iris,-1, sobely_weights * (-1))
+out_y = cv2.filter2D(iris,-1, sobely_weights)
+filtered = out_x + out_not_x + out_y + out_not_y
+processed = cv2.filter2D(filtered, -1, average_weights)
+processed_iris = Image.fromarray(processed, 'L')
+processed_iris.save("ProcessedIris.jpg")
