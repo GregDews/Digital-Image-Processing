@@ -4,7 +4,7 @@ CS390S Digital Image Processing
 
 Homework 1
 1. Load an image (self made)
-2. Convery to grey-scale image
+2. Convert to grey-scale image
 3. Apply filters: Sobel, Laplacian, Median
 4. Create your own filter not listed
 5. Using iris.bmp, detect edge of pupil
