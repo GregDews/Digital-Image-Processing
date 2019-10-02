@@ -4,3 +4,42 @@ numpy - for OpenCV
 Scipy
 Pillow?
 OpenCV
+
+
+Noise exercises?
+    Gaussian Noise      Randn()
+    Uniform Noise       Rand()
+    Rayleigh Noise      a+sqrt(-b*ln(1-U(0,1))) //U is random? matrix
+    Exponential Noise   -(1/a)*ln(1-U(0,1))
+    Salt & Pepper       ?
+                                Matlab uses natural log for Log method
+
+Morphological image processing
+    structuring element
+        define small matrix with 1's for included points
+    dilation and erosion, boundary
+        dilation
+            copy of B and shift this reflection by z
+            keep the set of all values that are covered by B as
+            the center is placed on every location of A
+            (expand one shape with traits of other shape)
+        erosion
+            copy of B and shift this reflection by z
+            keep only where B is fully covered by (contained in) A
+            (shrink one shape by traits of other shape)
+        open (A o B)
+            erosion, then dilation
+        closing (A ⋅ B)
+            dilation, then erosion
+        
+    fill the hole
+        use of dilation/erosion with various sizes to fill in specified shapes
+
+    convex hull
+
+    mathematical Morphology
+        set theory
+            not - obvious
+            and - only overlapping area
+            or  - combined total
+            xor - cut out union but keep indiv.
