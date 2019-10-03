@@ -17,10 +17,22 @@ import numpy as np
 import cv2
 
 # load the images
-pic = Image.open("YourFace.jpg")
-img = np.read(pic)
+img = np.read("face_dark.bmp")
 
+# convert to luv 
+luv = cv2.cvtColor(np.array(img).astype('float32')/255, cv2.COLOR_RGB2Luv)
 
+L = luv[0]
 
-pic_LAB = img.convert("LAB")
+range = cv2.max(cv2.max(L))
+L = L / range
+L2 = cv2.imadjust(L,[],[],0.6)
+L2 = L2 * range
+L= L * range
 
+luv[0] = L
+cv2.imshow(L)
+cv2.waitkey(0)
+
+cv2.imshow(luv)
+cv2.waitkey(0)
