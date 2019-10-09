@@ -43,3 +43,72 @@ Morphological image processing
             and - only overlapping area
             or  - combined total
             xor - cut out union but keep indiv.
+
+(10/9) Slide11.pdf - Facial Recognition project
+            hintcode only runs on 4 person data set
+                enroll folder for training
+
+    recommend reading through PCA Face Recognition
+    Midterm project report
+        eigen face plots
+
+            Training---
+            recommend finding a reshape function in numpy
+
+            scan matrix row by row to flatten for each image
+            average all images for Xi (person id)
+                (im01_01 + im01_ 02 + im01_04) / 3 = X1
+            mean average of entire data set (Me) (in project, only of training data set)
+            Ai = Xi - Me
+            calc eigenvector of A*A' -> P
+            calc the weight of training data projected into eigenspace wt_A = P'*A
+                P' (eigenvalue)
+
+        CMC curve - Cumulative Math Characteristic
+            resulting scores sorted and ranked
+            first guess is first rank - performance is percentage of correct values
+            only change incorrect guesses, and use next least euclid dst for second rank
+            since only incorrect are changed, CMC curve should always rise
+
+                True Positive Identification Rate
+        presentation
+            should talk about why the approach is different 
+        grades
+            performance  10pt
+            report       10pt
+            presentation  5pt (Due October 22nd)
+
+        for project
+            Add photos of yourself (Homework 3)
+                multiple facial expressions
+                mask out background
+                if you have neck included, keep consistent across all images
+            testing---
+                input - Me = Bi
+                P'Bi = wt_B (single vector with eigenvector quantities)
+                compare wt_B to each column of wt_A , if matching, it is that person
+            
+            adding efficiency to training
+                shortcutting 2500 x 2500 array problem
+                find eigenvector of A'A = P2 (40x40)
+                 rather than A*A' (2500x2500)
+                 A'*A * P2 = lamdaP2
+                 A A' A P2 = lamda A P2
+                 AA' Q = lamda Q 
+                 AA' P = lamda P
+                 ... therefore A P2 = P, or A (A'A)
+            CMC curve - hint code in slides/codes posted
+                rank 1 to 10
+
+
+    Python coding notes
+        numpy.transpose(matrix) to transpose
+        reshape is numpy method
+    Matlab coding notes
+        provides code to plot eigenfaces in FaceRecognitionDemo4Persons.m
+        4 person example is roughly the same as what is needed for project
+            will need to adjust averages for larger data set
+            also adjust result answer key based on what you load
+    Project recommendations
+        Check faceRecoganition4faces.pdf for example of report?
+        will discuss more by next time. Recommend download sample code and try
