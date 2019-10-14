@@ -12,7 +12,10 @@ Homework 4
 
     add noise
     histogram these images
-
-ACM event at 4pm in AES forum room
-
 """
+import numpy as np
+import cv2
+from matplotlib import pyplot as plt
+
+im = np.image
+
