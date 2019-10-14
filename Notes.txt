@@ -112,3 +112,44 @@ Morphological image processing
     Project recommendations
         Check faceRecoganition4faces.pdf for example of report?
         will discuss more by next time. Recommend download sample code and try
+
+(10/14) Image Quality Assessment
+            Image_quality)metrics.pdf - referenced on slide
+        
+        subjective - concerned with how image is perceived by a viewer's opinion 
+            Mean Opinion Score (MOS) - average of ratings
+                Bad, Poor, Fair, Good, Excellent (1-5)
+        
+        objective - mathematical models that approx. results of Quality
+            need to develop quantitative measures that can predict perceived Quality
+
+        three types of objective evaluation
+            Full Reference - direct comparison
+                Mean Square Error
+                    (1/MxN) epsyl(i-m) epsyl(j-n) (X_ij - Y_ij)^2
+                    (average squared difference of each pixel, smaller result is less error)
+
+
+                PSNR - based on Mean Square Error
+                    10 log_10 (L^2/MSE)
+                    *L is dynamic range of pixel values
+                    (Larger value of PSNR means less error)
+                
+                SSIM measurement system - Structural Similarity Index
+                    luminance and contrast comparisons for a given neighborhood combined using 3 separate scores
+                    l(x,y) = 2mux muy + c1 / mux^2 + muy^2 + c1         average - mu
+                    c(x,y) = 2delx dely + c2 / delx^2 + dely^2 + c2     variance - del
+                    s(x,y) = delxy + c3 / delx * dely + c3              covariance - delxy
+                            c3 = c2/2
+                    SSIM(x,y) = (l * c * s) #specific form within 0-1 where 1 is no error found
+                    
+                    Demo code uses Mean SSIM - to include multiple neighborhoods
+
+                uses:
+                    monitor control image Quality
+                    benchmark image processing systems
+                    optimize algorithms and parameters
+                    help home users better manage their digital photos and evaluate their expertise in photography
+
+    Exercise - on wednesday
+
