@@ -59,7 +59,6 @@ pepper = np.ceil(amount* circle.size * (1. - ratio))
 coords = [np.random.randint(0, i - 1, int(pepper))
          for i in circle.shape]
 s_n_p[coords] = 0
-
 img_snp = Image.fromarray(s_n_p)
 img_snp.save("SnPCircle.TIFF")
 
@@ -68,20 +67,18 @@ fig1 = plt.figure()
 a = fig1.add_subplot(1, 4, 1)
 imgplot = plt.imshow(circle, 'gray')
 a.set_title('Original')
-
 a = fig1.add_subplot(1, 4, 2)
 imgplot = plt.imshow(gaussNoise, 'gray')
 a.set_title('Gaussian Noise')
-
 a = fig1.add_subplot(1, 4, 3)
 imgplot = plt.imshow(uniform, 'gray')
 a.set_title('Uniform Noise')
-
 a = fig1.add_subplot(1, 4, 4)
 imgplot = plt.imshow(s_n_p, 'gray')
 a.set_title("Salt n Pepper")
 plt.show()
 
+# histograms
 fig2 = plt.figure()
 a = fig2.add_subplot(1, 4, 1)
 imgplot = plt.hist(circle.ravel())
@@ -99,4 +96,34 @@ plt.show()
 
 """
 need to add filters and fixes
+plan of attack:
+salt n pepper:  median filter
+gaussian noise: blur then sharpen?
+uniform noise:  threshold two values and fill holes?
 """
+filtered_snp = median_filter(s_n_p)
+filtered_gauss = cv2.medianblur(cv2.Laplacian(gaussNoise))
+
+
+
+def median_filter(arr):
+    #Pad image with copy of bordering pixels
+    padded = cv2.copyMakeBorder(
+        arr, 1, 1, 1, 1, cv2.BORDER_REFLECT, None)
+
+    width = len(padded) - 1
+    length = len(padded[0]) - 1
+    pix = [0]*9
+    for i in range(1,width):
+        for j in range(1,length):
+            pix[0] = padded[i-1][j-1]
+            pix[1] = padded[i][j-1]
+            pix[2] = padded[i+1][j-1]
+            pix[3] = padded[i-1][j]
+            pix[4] = padded[i][j]
+            pix[5] = padded[i+1][j]
+            pix[6] = padded[i-1][j+1]
+            pix[7] = padded[i][j+1]
+            pix[8] = padded[i+1][j+1]
+            arr[i-1][j-1] = sorted(pix)[4]
+    return arr
