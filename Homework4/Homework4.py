@@ -17,6 +17,27 @@ import cv2
 from matplotlib import pyplot as plt
 from PIL import Image
 
+def median_filter(arr):
+    #Pad image with copy of bordering pixels
+    padded = cv2.copyMakeBorder(
+        arr, 1, 1, 1, 1, cv2.BORDER_REFLECT, None)
+    width = len(padded) - 1
+    length = len(padded[0]) - 1
+    pix = [0]*9
+    for i in range(1,width):
+        for j in range(1,length):
+            pix[0] = padded[i-1][j-1]
+            pix[1] = padded[i][j-1]
+            pix[2] = padded[i+1][j-1]
+            pix[3] = padded[i-1][j]
+            pix[4] = padded[i][j]
+            pix[5] = padded[i+1][j]
+            pix[6] = padded[i-1][j+1]
+            pix[7] = padded[i][j+1]
+            pix[8] = padded[i+1][j+1]
+            arr[i-1][j-1] = sorted(pix)[4]
+    return arr
+
 # Make some noise!
 circle = np.ones((256,256), np.uint8) * 178 # 0.7*255 = 178
 width, height = circle.shape
@@ -76,7 +97,6 @@ a.set_title('Uniform Noise')
 a = fig1.add_subplot(1, 4, 4)
 imgplot = plt.imshow(s_n_p, 'gray')
 a.set_title("Salt n Pepper")
-plt.show()
 
 # histograms
 fig2 = plt.figure()
@@ -95,35 +115,63 @@ a.set_title("Salt n Pepper")
 plt.show()
 
 """
-need to add filters and fixes
 plan of attack:
 salt n pepper:  median filter
 gaussian noise: blur then sharpen?
-uniform noise:  threshold two values and fill holes?
+uniform noise:  average filter
 """
+# salt and pepper recovery
 filtered_snp = median_filter(s_n_p)
-filtered_gauss = cv2.medianblur(cv2.Laplacian(gaussNoise))
+img_filtered_snp = Image.fromarray(filtered_snp)
+img_filtered_snp.save("FilteredSnP.TIFF")
+
+# gaussian noise recovery
+blurred = cv2.GaussianBlur(gaussNoise, (5,5),0)
+filtered_gauss = cv2.Laplacian(blurred, -1) + blurred
+img_filtered_gauss = Image.fromarray(filtered_gauss)
+img_filtered_gauss.save("FilteredGauss.TIFF")
 
 
+# uniform noise recovery
+average_weights = np.array([
+    [ 1, 1, 1, 1, 1],
+    [ 1, 1, 1, 1, 1],
+    [ 1, 1, 1, 1, 1],
+    [ 1, 1, 1, 1, 1],
+    [ 1, 1, 1, 1, 1]])/25
+processed_uniform = cv2.filter2D(uniform, -1, average_weights)
+img_filtered_uniform = Image.fromarray(processed_uniform)
+img_filtered_uniform.save("FilteredUniform.TIFF")
 
-def median_filter(arr):
-    #Pad image with copy of bordering pixels
-    padded = cv2.copyMakeBorder(
-        arr, 1, 1, 1, 1, cv2.BORDER_REFLECT, None)
 
-    width = len(padded) - 1
-    length = len(padded[0]) - 1
-    pix = [0]*9
-    for i in range(1,width):
-        for j in range(1,length):
-            pix[0] = padded[i-1][j-1]
-            pix[1] = padded[i][j-1]
-            pix[2] = padded[i+1][j-1]
-            pix[3] = padded[i-1][j]
-            pix[4] = padded[i][j]
-            pix[5] = padded[i+1][j]
-            pix[6] = padded[i-1][j+1]
-            pix[7] = padded[i][j+1]
-            pix[8] = padded[i+1][j+1]
-            arr[i-1][j-1] = sorted(pix)[4]
-    return arr
+# Show they are fixed!
+fig1 = plt.figure()
+a = fig1.add_subplot(1, 4, 1)
+imgplot = plt.imshow(circle, 'gray')
+a.set_title('Original')
+a = fig1.add_subplot(1, 4, 2)
+imgplot = plt.imshow(filtered_gauss, 'gray')
+a.set_title('Gaussian Noise')
+a = fig1.add_subplot(1, 4, 3)
+imgplot = plt.imshow(processed_uniform, 'gray')
+a.set_title('Uniform Noise')
+a = fig1.add_subplot(1, 4, 4)
+imgplot = plt.imshow(filtered_snp, 'gray')
+a.set_title("Salt n Pepper")
+
+# histograms
+fig2 = plt.figure()
+a = fig2.add_subplot(1, 4, 1)
+imgplot = plt.hist(circle.ravel())
+a.set_title('Original')
+a = fig2.add_subplot(1, 4, 2)
+imgplot = plt.hist(filtered_gauss.ravel(), bins=256)
+a.set_title('Gaussian Noise')
+a = fig2.add_subplot(1, 4, 3)
+imgplot = plt.hist(processed_uniform.ravel(), bins=256)
+a.set_title('Uniform Noise')
+a = fig2.add_subplot(1, 4, 4)
+imgplot = plt.hist(filtered_snp.ravel(), bins=256)
+a.set_title("Salt n Pepper")
+plt.show()
+

@@ -153,3 +153,56 @@ Morphological image processing
 
     Exercise - on wednesday
 
+(10/16)
+    !!!!required reading!!!!
+    Graph-based visual saliency 
+    
+    Talk about more new stuffs, then exercise
+
+    Visual Saliency: visual focus estimation
+        a more salient area is more attractive to the eye
+        models: original by itti - 1998 (paper focuses on mathematical principles / algorithms)
+            Shannon self-information (same lab, but diff author Bruce 2005)
+            Incorporating temporal dynamics (itti 2009)
+    L. Itti's approach (Bottom-up approach)
+        input->Gaussian pyramids->colors|intensity|orientations->feature maps->conspicuity maps->combine into saliency map
+
+        find raw features: intensity changes, color changes, edges
+        orientation features: angles of the lines
+            use sobel at certain angles? (find horizon, or trends of directions)
+        distance also matters - downsample incrementally by scaling down and make each equally important
+
+        center-surround difference - how much something contrasts to the surrounding environment
+            matrix of difference from one pixel to the other pixels
+            weighted dissimilarity
+                Gaussian model to show ratio of distance weight based on current location - for smooth distribution
+                how far down you scale matters - practice practice practice
+        
+        equilibrium state of Markov chain - most obvious, that are closer, become more obvious, outliers and less obvious are diminished
+
+    MIT benchmark of saliency - Judd et. all and ... better performance but based on itti
+
+(10/23) Project info
+    Demo in matlab goes by column
+    covariance matrix is P aka (A A')
+        demo code calcs (A' A) = P2
+        A * P2 = P
+
+        A1 is average of 5 pictures for person 1 A2 is average of 5 pictures for person 2, etc
+
+        P' A = wt_A
+        P' is [e1 ->, e2 ->,...]  ->
+        A is [a11, a21, a31,...]  V V
+        wt_A
+
+    python demo code
+        Project1_train.py
+        did not use efficent version, just original of (A A') for  P
+        X_flat[43, 1000] #100 x 100 pictures
+         using original way eigenvectors will be 10000x10000
+        P'A is normal Wt_A will have row per person aka single vector per person
+
+        wt_A.npy, mean_vect.npy are saved for use in testing
+        utility file has useful methods for processing the training
+        
+        need to load results
