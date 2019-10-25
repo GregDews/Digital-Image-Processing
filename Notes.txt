@@ -186,7 +186,7 @@ Morphological image processing
     Demo in matlab goes by column
     covariance matrix is P aka (A A')
         demo code calcs (A' A) = P2
-        A * P2 = P
+        A(44, 1000) * P2(44,44) = P
 
         A1 is average of 5 pictures for person 1 A2 is average of 5 pictures for person 2, etc
 
