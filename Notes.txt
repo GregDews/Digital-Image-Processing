@@ -1,9 +1,12 @@
 Possible libraries to replace matlab
+    numpy - for OpenCV
+    Scipy
+    Pillow
+    MatPlotLib
+    SKImage
 
-numpy - for OpenCV
-Scipy
-Pillow?
-OpenCV
+    premade library for most tasks (not allowed for projects)
+     sklearn - machine learning library similar to cv2, but more functions relate to this class)
 
 
 Noise exercises?
@@ -14,7 +17,7 @@ Noise exercises?
     Salt & Pepper       ?
                                 Matlab uses natural log for Log method
 
-Morphological image processing
+(9/4?) Morphological image processing
     structuring element
         define small matrix with 1's for included points
     dilation and erosion, boundary
@@ -153,7 +156,7 @@ Morphological image processing
 
     Exercise - on wednesday
 
-(10/16)
+(10/16) Visual Saliency
     !!!!required reading!!!!
     Graph-based visual saliency 
     
@@ -206,3 +209,110 @@ Morphological image processing
         utility file has useful methods for processing the training
         
         need to load results
+
+
+
+(11/4) Human Visual System
+    Final project information - START EARLY DUM-DUM
+        choose our own topic - must solve real image problem
+        Must use the methods and tools we have learned thus far
+        Quality evaluation, Morphological tools, image processing principles
+        presentation and report
+    Talk to teacher about final project concepts
+        possible concepts
+            auto image orientation? (hough lines, saliency, ...)
+
+    Homework 5 posted today - saliency & quality control
+
+    Visual Saliency coverage again
+        combine with quality Assessment to make objective version
+    Handles when subject is distorted, compared to when background is distorted
+
+    GBVS from blackboard
+        python users find saliency function in OpenCV
+
+    objective
+        generate 2 images and calculate quality of each with comparison to original
+        provide own image with specific subject to get better result
+            possible distortions - crop portion, 
+        MSE - average difference of all pixels
+            could add weight based on pixel location before averaging total
+        PSNR - 
+        SSIM - code in matlab - possibly not found
+        Own Metric - must be well defined and need to analyze process to show 
+            Definition
+                what is the range of quality
+            how do you use the metric
+        
+        one possible way to implement combo
+        {(Original - Distorted)^2 * (saliency map normalized between 0-1 } sum all, divide by total
+
+        design intelligent quality metric that uses saliency
+
+    Human Visual System
+        Human Perception - end result is human "consumption"
+            enhancement / restoration
+            image compression
+            metrics to measure Quality
+            encompasses physiological and psychological components
+            Needed to be studied/understood to design better compression/enhancement/image processing tools
+
+        two primary components
+            eyes - sensor
+            brain - processor
+            *Reh-Tina new favorite pronunciation quirk - sorry "In Reliaty" <- still good though
+
+        brightness adaptation - responds to wide range of brightness
+            dark threshold: below this level all appears black
+            glare limit: above this level is blinding, all we see is white
+            also effected by surround areas
+
+        can normally detect 20 changes in brightness in a small area within a complex image
+        100 different gray levels necessary to create realistic image - else false countours
+
+        perception and illusion
+            biological model is limited
+            spatial frequency resolution and brightness adaptation phenomena are cause by physiological
+            Mach Band Effect
+                lateral inhibition process inherent in visual neural system which emphasizes edges
+                laplacian-esque process brain uses to see edges
+            brightness affected by surround area, not just individual intensities
+            brain completes missing spatial info / misinterprets object's attributes
+            arrangement also effects perception of relative objects
+
+(11/6) Image compression
+    Motivation to compress
+        Saving space
+        efficiency
+    Reason for compression
+        data redundency - solvable issue
+    Different Standards
+        homepages.cae.wisc.edu/~ece544/project/f06/aguilera_rpt.pdf
+    
+    compression - dependent upon standard used
+        encoder - pre processing, mapping, compression algorithms
+            JPEG 
+                three phases - 8x8 blocks
+                    Descreet Cosine Transform - YUV format to preserve more important aspects for human sight
+                    Quantization - zig-zag scan of image after transorm takes advantage of freq. domain gradiant
+                    coding of DC (first element) and AC (other elements) then compress resultant using coding scheme
+                    Huffman Coding - covered in comp org 1 by Feng, Jiang
+                        source reduction and code assignment
+                        binary tree of single path - 1, 00, 010, 011, 0111  
+
+        decoder
+            recover picture from compression.
+        
+        video compression - must handle image redundency and temporal redundency
+            motion-estimation and motion-compensation - most heavy calculation portion
+                vector representation of region moving. Only compress the moving region
+            
+
+(Final Project) Concepts and ideas  Monday of finals week roughly the same time
+    concepts
+        video processing - compression or motion detection
+            can take frame by frame but info is already handled in file format and is handled by decoder
+    presentation
+        no make up for final - obviously
+
+(end)

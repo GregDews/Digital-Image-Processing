@@ -23,8 +23,6 @@ testing---
     Python coding notes
     numpy.transpose(matrix) to transpose
     reshape is numpy method
-    Check faceRecoganition4faces.pdf for example of report?
-    will discuss more by next time. Recommend download sample code and try
     """
 
 import numpy as np
@@ -76,7 +74,6 @@ def train():
 
     image_width = X_arr.shape[2]
     image_height = X_arr.shape[1]
-    dims = (image_height, image_width)
 
     vect_length = image_height*image_width
     M = X_arr.shape[0]  # number of training images
@@ -88,8 +85,7 @@ def train():
 
     print('     Constructing dictionary of {} persons on {} training images...'.format(m, M))
 
-    # 2. build avg vector for each person !!!!
-    #  create parallel list to hold img names
+    # 2. build avg vectors
     print('     Creating average vector of images from each face...')
     avg_vects = np.empty((Mp, vect_length), dtype=X_arr[0].dtype)
     avg_vects_names = []
@@ -99,9 +95,7 @@ def train():
 
         temp_vects = np.empty((len(value), vect_length), dtype=X_arr[0].dtype)
         for i in range(temp_vects.shape[0]):
-            # print('{} : {}'.format(key,self.X_flat[value[i]]))
             temp_vects[i] = X_flat[value[i]]
-        # avg vectors for given image
         avg_vects[row] = temp_vects.mean(axis=0)
         row += 1
     print('     Done...')
@@ -144,6 +138,80 @@ def train():
             image_width, image_height), 'gray')
     plt.show()
 
+    # First person weights
+    plt.figure()
+    plt.imshow(wt_A[0])
+    plt.title(avg_vects_names[0])
+    plt.show()
+
+    #Testing
+    # load all images in a directory
+    loaded_images = list()
+    X_filenames = list()
+    testee_dict = dict()
+    num = 0
+    for filename in listdir('Project1/images/testing'):
+        if ".bmp" in filename:
+            img_data = cv2.imread('Project1/images/testing/' + filename, 0)
+            person = filename[0:-8]
+            if person not in testee_dict:
+                testee_dict[person] = []
+            testee_dict[person].append(num)
+            num += 1
+            loaded_images.append(img_data)
+    
+    all_images = [image[np.newaxis, ...] for image in loaded_images]
+
+    try:
+        X_arr = np.concatenate(all_images)
+    except ValueError:
+        raise ValueError('Image dimensions must agree.')
+
+    image_width = X_arr.shape[2]
+    image_height = X_arr.shape[1]
+    vect_length = image_height*image_width
+    M = X_arr.shape[0]  # number of testing images
+    X_flat = convert_to_vects(X_arr)  # Convert images to vectors
+
+    print('     Subtracting mean from all test images...')
+    X_flat_centered = np.empty(X_flat, dtype=X_arr[0].dtype)
+    for i in range(Mp):
+        X_flat_centered[i] = center_vect(X_flat[i], mean_vect)
+    X_flat_centered = X_flat_centered
+    print('     Done...')
+
+    m = len(testee_dict.keys())
+    trial = []
+    incorrect = []
+    dist = []
+    answers = []
+    cmc_total = []
+    for i in range(m):
+        answers.append(i)
+
+    # Rank 1
+    rank = 1
+    print("Rank: 1")
+    for i in X_flat_centered:
+        for j in len(wt_A):
+            dist[i][j] = ((X_flat_centered[i]**2)-(wt_A[j]**2))**0.5
+        trial[i]= dist[i].index(min(dist[i]))
+        if trial[i] != answers[i]:
+            incorrect.append(i)
+    
+    # Rank n
+    while len(incorrect) != 0 or rank < 10:
+        rank += 1
+        print("Rank: " + rank)
+        for i in incorrect:
+            dist[i][trial[i]] = np.full_like(dist[i],9999)
+            trial[i] = dist[i].index(min(dist[i]))
+            if trial[i] == answers[i]:
+                incorrect.remove(i)
+
+
+    
+    print("No graphical answer, yet.")
 
 def convert_to_vect(mat_):
 
@@ -180,18 +248,6 @@ def center_vect(vect, mean_vect):
     return centered
 
 
-def test():
-
-    load_weight = np.load('wt_A.npy')
-    load_mean_vect = np.load('mean_vect.npy')
 
 if __name__ == "__main__":
-    response = input("train(1) or test(2)")
-    if "Train" in response or response is "1":
-        print("Training")
-        train()
-    elif "Test" in response or response is "2":
-        print("Testing")
-        test()
-    elif response:
-        print("did not match a command")
+    train()

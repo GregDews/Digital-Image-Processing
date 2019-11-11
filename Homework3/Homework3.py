@@ -18,36 +18,90 @@ import numpy as np
 import cv2
 
 
-def imadjust(src, dst, tol, channel, vIn = (0,255), vOut = (0,255)):
-    rows, cols = src.shape
-    cv2.calcHist(src, [channel], None, [256], [0,255])
-    # Stretching
-    for r in range(rows):
-        for c in range(cols):
-            vs = max(src(r, c) - vIn[0], 0)
-            vd = min(int(vs + 0.5) + vOut[0], vOut[1])
-            dst[r, c, channel] = vd
+def detect_face(image):
+    width, height, depth = image.shape[0:3]
+    result = np.zeros((width, height, depth))
+    RED = image[:,:,2]
+    GREEN = image[:,:,1]
+    BLUE = image[:,:,0]
+    for j in range(width):
+        for k in range(height):
+            red = int(RED[j][k])
+            grn = int(GREEN[j][k])
+            blu = int(BLUE[j][k])
+            rgb = [red, grn, blu]
+            rvg = (abs(red - grn) > 15) and (red > grn)
+            if (red > 95) and (grn > 40) and (blu > 20) and (max(rgb) - min(rgb) > 15) and rvg and (red > blu):
+                result[j][k][0:3] = image[j][k][0:3]
+            else:
+                result[j][k][0:3] = 0
+    result = np.uint8(result)
+    luv_img = cv2.cvtColor(result, cv2.COLOR_BGR2Luv)
+    hgram = np.zeros(256)
+    for m in range(width):
+        for n in range(height):
+            hgram[luv_img[m][n][0]] += 1
+    hsversion = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    thold = otsu_thresh(hgram)
+    for m in range(width):
+        for n in range(height):
+            if hsversion[m][n][1] > thold: 
+                result[m][n][0:3] = image[m][n][0:3]
+            else:
+                result[m][n][0:3] = 0
+    result = np.uint8(result)
+    return result
 
 
-# load the images
-img = cv2.imread("face_dark.bmp")
+def otsu_thresh(hist):
+    total_px = sum(hist)
+    wcv = {}
+    for t in range(256):
+        w_b = sum(hist[0:t])/total_px
+        w_f = sum(hist[t:256])/total_px
+        mu_b = 0
+        mu_f = 0
+        var_b = 0
+        var_f = 0
 
-# convert to luv 
-luv = cv2.cvtColor(np.array(img).astype('float32')/255, cv2.COLOR_RGB2Luv)
+        for m in range(t):
+            mu_b += (m * hist[m])
+        mu_b /= max(sum(hist[0:t]), 1)
+        for v in range(t):
+            var_b += (v-mu_b)**2 * hist[v]
+        var_b /= max(sum(hist[0:t]), 1)
 
-L = luv[0]
+        for m in range(t, 256):
+            mu_f += (m * hist[m])
+        mu_f /= max(sum(hist[t:256]), 1)
+        for v in range(t, 256):
+            var_f += (v-mu_f)**2 * hist[v]
+        var_f /= max(sum(hist[t:256]), 1)
 
-range = np.amax(np.amax(L))
-L = L / range
-L2 = L
-imadjust(L,L2,0.6,0)
-L2 = L2 * range
-L= L * range
+        wcv[t] = (w_b * var_b) + (w_f * var_f)
+        index_min = 255
+    for x in range(256):
+        if wcv[x] < wcv[index_min]:
+            index_min = x
+    return index_min
 
-luv[0] = L
-cv2.imshow(L)
-cv2.waitkey(0)
+im = cv2.imread("me1.bmp")
+mydetect1 = detect_face(im)
+cv2.imwrite("me1_filtered.png", cv2.cvtColor(mydetect1, cv2.COLOR_BGR2GRAY))
 
-cv2.imshow(luv)
-cv2.waitkey(0)
+im2 = cv2.imread("me2.bmp")
+mydetect2 = detect_face(im2)
+cv2.imwrite("me2_filtered.png", cv2.cvtColor(mydetect2, cv2.COLOR_BGR2GRAY))
+
+im3 = cv2.imread("me3.bmp")
+mydetect3 = detect_face(im3)
+cv2.imwrite("me3_filtered.png", cv2.cvtColor(mydetect3, cv2.COLOR_BGR2GRAY))
+
+im4 = cv2.imread("me4.bmp")
+mydetect4 = detect_face(im4)
+cv2.imwrite("me4_filtered.png", cv2.cvtColor(mydetect4, cv2.COLOR_BGR2GRAY))
+
+im5 = cv2.imread("me5.bmp")
+mydetect5 = detect_face(im5)
+cv2.imwrite("me5_filtered.png", cv2.cvtColor(mydetect5, cv2.COLOR_BGR2GRAY))
 
